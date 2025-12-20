@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Oxygenate</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_config">ConfigActivity</string>
+</resources>

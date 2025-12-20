@@ -74,4 +74,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     ksp(libs.yukihookapi.ksp.xposed)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.libsu.core)
 }

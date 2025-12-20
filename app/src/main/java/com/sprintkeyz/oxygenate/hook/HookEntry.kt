@@ -30,42 +30,37 @@ object HookEntry : IYukiHookXposedInit {
     override fun onHook() = YukiHookAPI.encase {
             loadApp("com.android.systemui") {
                 // Get preference using YukiHookAPI's prefs system
-                val isEnabled = prefs.get(DataConst.MODULE_ENABLED)
+                val isRedOneVisible = prefs.get(DataConst.RED_ONE_VISIBLE)
 
-                YLog.info("Module enabled status: $isEnabled")
+                if (isRedOneVisible) {
 
-                // Only hook if enabled
-                if (!isEnabled) {
-                    YLog.info("Module is disabled, skipping hook")
-                    return@loadApp
-                }
+                    "com.android.systemui.statusbar.policy.Clock".toClass()
+                        .resolve()
+                        .firstMethod {
+                            name = "updateClock"
+                            emptyParameters()
+                        }
+                        .hook {
+                            after {
+                                val tv = instance<TextView>()
+                                val text = tv.text.toString()
 
-                "com.android.systemui.statusbar.policy.Clock".toClass()
-                    .resolve()
-                    .firstMethod {
-                        name = "updateClock"
-                        emptyParameters()
-                    }
-                    .hook {
-                        after {
-                            val tv = instance<TextView>()
-                            val text = tv.text.toString()
+                                if (text.isNotEmpty() /*&& text[0] == '1'*/) {
+                                    val spannable = SpannableString(text)
+                                    spannable.setSpan(
+                                        ForegroundColorSpan(Color.RED),
+                                        0,
+                                        1,
+                                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                    )
 
-                            if (text.isNotEmpty() /*&& text[0] == '1'*/) {
-                                val spannable = SpannableString(text)
-                                spannable.setSpan(
-                                    ForegroundColorSpan(Color.RED),
-                                    0,
-                                    1,
-                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                                )
-
-                                tv.text = spannable
+                                    tv.text = spannable
+                                }
                             }
                         }
-                    }
 
-                YLog.info("Clock hook installed successfully")
+                    YLog.info("Clock hook installed successfully")
+                }
             }
     }
 }

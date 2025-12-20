@@ -20,6 +20,7 @@ activity = "1.12.2"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.2"
 composeBom = "2025.12.01"
+libsu = "6.0.0"
 
 
 [libraries]
@@ -49,6 +50,7 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+libsu-core = { group = "com.github.topjohnwu.libsu", name = "core", version.ref = "libsu" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

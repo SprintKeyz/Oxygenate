@@ -1,10 +1,11 @@
 package com.sprintkeyz.oxygenate.ui
 
+import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,40 +19,37 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.BatteryChargingFull
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.highcapable.yukihookapi.YukiHookAPI
-import com.sprintkeyz.oxygenate.ui.theme.OxygenateTheme
 import com.highcapable.yukihookapi.hook.factory.prefs
 import com.sprintkeyz.oxygenate.data.DataConst
+import com.sprintkeyz.oxygenate.ui.theme.OxygenateTheme
+import com.sprintkeyz.oxygenate.utils.isRootAvailable
+import com.sprintkeyz.oxygenate.utils.restartSystemUI
 
 // two status bar tweak ideas:
 // red 1 always visible
@@ -61,23 +59,46 @@ import com.sprintkeyz.oxygenate.data.DataConst
 
 class ConfigActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // display a toast if root
+        if (isRootAvailable()) {
+            Toast.makeText(this, "Root available", Toast.LENGTH_SHORT).show()
+        }
+
+        else {
+            Toast.makeText(this, "Root NOT available", Toast.LENGTH_SHORT).show()
+        }
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             OxygenateTheme {
                 ConfigScreen(
-                    isModuleActive = YukiHookAPI.Status.isModuleActive
+                    isModuleActive = YukiHookAPI.Status.isModuleActive,
+                    context = this
                 )
             }
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfigScreen(
-    isModuleActive: Boolean
+    isModuleActive: Boolean,
+    context: Context
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    // get red one status
+    var isRedOneVisible by remember {
+        mutableStateOf(context.prefs().get(DataConst.RED_ONE_VISIBLE))
+    }
+
+    fun onRedOneVisibleChange(enabled: Boolean) {
+        context.prefs().edit {
+            put(DataConst.RED_ONE_VISIBLE, enabled)
+            isRedOneVisible = enabled
+        }
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -94,7 +115,19 @@ fun ConfigScreen(
                     )
 
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                actions = {
+                    // Restart SystemUI button
+                    IconButton(onClick = {
+                        restartSystemUI()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Restart SystemUI",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
             )
         }
     ) { innerPadding ->
@@ -138,8 +171,8 @@ fun ConfigScreen(
                 icon = Icons.Default.AccessTime,
                 title = "Red 1 Always Visible",
                 subtitle = "Makes the clock red 1 always visible",
-                checked = false,
-                onCheckedChange = {}
+                checked = isRedOneVisible,
+                onCheckedChange = ::onRedOneVisibleChange
             )
         }
     }

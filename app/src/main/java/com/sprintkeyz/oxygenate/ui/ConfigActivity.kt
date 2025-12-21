@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -74,6 +75,7 @@ class ConfigActivity : ComponentActivity() {
             OxygenateTheme {
                 ConfigScreen(
                     isModuleActive = YukiHookAPI.Status.isModuleActive,
+                    isRooted = isRootAvailable(),
                     context = this
                 )
             }
@@ -85,17 +87,18 @@ class ConfigActivity : ComponentActivity() {
 @Composable
 fun ConfigScreen(
     isModuleActive: Boolean,
+    isRooted: Boolean,
     context: Context
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     // get red one status
     var isRedOneVisible by remember {
-        mutableStateOf(context.prefs().get(DataConst.RED_ONE_VISIBLE))
+        mutableStateOf(context.prefs().get(DataConst.HOOK_RED_ONE_ALWAYS_VISIBLE))
     }
 
     fun onRedOneVisibleChange(enabled: Boolean) {
         context.prefs().edit {
-            put(DataConst.RED_ONE_VISIBLE, enabled)
+            put(DataConst.HOOK_RED_ONE_ALWAYS_VISIBLE, enabled)
             isRedOneVisible = enabled
         }
     }
@@ -138,17 +141,12 @@ fun ConfigScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
         ) {
-            SectionHeaderItem("Overview")
+            SectionHeaderItem("Status")
             Spacer(modifier = Modifier.height(8.dp))
             
-            StatusCardItem(
-                "Module Status",
-                message = if (isModuleActive) {
-                    "Oxygenate is active."
-                } else {
-                    "Oxygenate has not been activated."
-                },
-                isActive = isModuleActive
+            ModuleStatusCardItem(
+                isActive = isModuleActive,
+                isRootAvailable = isRooted
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -189,18 +187,35 @@ fun SectionHeaderItem(title: String) {
 }
 
 @Composable
-fun StatusCardItem(
-    title: String,
-    message: String,
-    isActive: Boolean
+fun ModuleStatusCardItem(
+    isActive: Boolean,
+    isRootAvailable: Boolean
 ) {
+    var containerColor = MaterialTheme.colorScheme.errorContainer
+    var textColor = MaterialTheme.colorScheme.onErrorContainer
+    var title = "Disabled"
+    var description = "Please activate Oxygenate in LSPosed"
+
+    // fully active if both root and xposed are available
+    if (isActive && isRootAvailable) {
+        containerColor = MaterialTheme.colorScheme.primaryContainer
+        textColor = MaterialTheme.colorScheme.onPrimaryContainer
+        title = "Enabled"
+        description = "Oxygenate is active"
+    }
+
+    // no root enabled
+    else if (isActive) {
+        containerColor = Color.hsv(47F, 0.87F, 1.0F)
+        textColor = Color.hsv(42F, 1.0F, 0.23F)
+        title = "Partially Enabled"
+        description = "Oxygenate is enabled, but requires root to fully work"
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (isActive)
-                MaterialTheme.colorScheme.primaryContainer
-            else
-                MaterialTheme.colorScheme.errorContainer
+            containerColor = containerColor
         )
     ) {
         Column(
@@ -210,19 +225,13 @@ fun StatusCardItem(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = if (isActive)
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                else
-                    MaterialTheme.colorScheme.onErrorContainer
+                color = textColor
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = message,
+                text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (isActive)
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                else
-                    MaterialTheme.colorScheme.onErrorContainer
+                color = textColor
             )
         }
     }

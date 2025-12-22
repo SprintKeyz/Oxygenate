@@ -75,4 +75,5 @@ dependencies {
     ksp(libs.yukihookapi.ksp.xposed)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.libsu.core)
+    implementation(libs.androidx.navigation.compose)
 }

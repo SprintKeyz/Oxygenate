@@ -5,8 +5,8 @@ import com.topjohnwu.superuser.Shell
 // async restart for systemUI
 // needing su just for this is a pain, but whatever
 // maybe some tweaks will use it later?
-fun restartSystemUI() {
-    Shell.cmd("pkill -f com.android.systemui").exec()
+fun restartPackage(packageIdentifier: String) {
+    Shell.cmd("pkill -f $packageIdentifier").exec()
 }
 
 fun isRootAvailable(): Boolean {

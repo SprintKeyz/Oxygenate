@@ -52,8 +52,8 @@ object RedOneHook : AbstractHook() {
                         val tv = instance<TextView>()
                         val text = tv.text.toString()
 
-                        if (text.isNotEmpty() && text[0] == '2') {
-                            val endIndex = if (text[1] == '2') 2 else 1
+                        if (text.isNotEmpty() && text[0] == '1') {
+                            val endIndex = if (text[1] == '1') 2 else 1
                             val spannable = SpannableString(text)
                             // our color is controlled by visibility state
                             // at this point in the code, it could either be always (red) or never (white)

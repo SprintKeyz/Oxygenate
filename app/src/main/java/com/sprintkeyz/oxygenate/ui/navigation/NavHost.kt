@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sprintkeyz.oxygenate.ui.screens.MainConfigScreen
+import com.sprintkeyz.oxygenate.ui.screens.MiscConfigScreen
 import com.sprintkeyz.oxygenate.ui.screens.StatusBarConfigScreen
 
 @Composable
@@ -50,12 +51,20 @@ fun NavHost(
             MainConfigScreen(
                 isModuleActive = isModuleActive,
                 isRooted = isRooted,
-                onNavigateToStatusBar = { navController.navigate("statusBar") }
+                onNavigateToStatusBar = { navController.navigate("statusBar") },
+                onNavigateToMisc = { navController.navigate("misc") }
             )
         }
 
         composable("statusBar") {
             StatusBarConfigScreen(
+                onBackClick = { navController.popBackStack() },
+                context = context
+            )
+        }
+
+        composable("misc") {
+            MiscConfigScreen(
                 onBackClick = { navController.popBackStack() },
                 context = context
             )

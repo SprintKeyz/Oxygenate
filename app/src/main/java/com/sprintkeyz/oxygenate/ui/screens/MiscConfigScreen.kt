@@ -1,5 +1,6 @@
 package com.sprintkeyz.oxygenate.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,36 +9,53 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MiscellaneousServices
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.SignalCellularAlt
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ExtensionOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sprintkeyz.oxygenate.ui.components.ModuleStatusCardItem
+import com.highcapable.yukihookapi.hook.factory.prefs
+import com.sprintkeyz.oxygenate.data.MiscDataConst
 import com.sprintkeyz.oxygenate.ui.components.SectionHeaderItem
-import com.sprintkeyz.oxygenate.ui.components.SubmenuItem
+import com.sprintkeyz.oxygenate.ui.components.SwitchItem
 import com.sprintkeyz.oxygenate.utils.restartPackage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainConfigScreen(
-    isModuleActive: Boolean,
-    isRooted: Boolean,
-    onNavigateToStatusBar: () -> Unit,
-    onNavigateToMisc: () -> Unit
+fun MiscConfigScreen(
+    onBackClick: () -> Unit,
+    context: Context
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    var optimizationToastDisabledState by remember {
+        mutableStateOf(context.prefs().get(
+            MiscDataConst.OPTIMIZATION_TOAST_DISABLED_STATE
+        ))
+    }
+
+    fun onOptimizationToastDisabledChange(isDisabled: Boolean) {
+        restartPackage("com.oplus.athena")
+
+        context.prefs().edit {
+            put(MiscDataConst.OPTIMIZATION_TOAST_DISABLED_STATE, isDisabled)
+        }
+
+        optimizationToastDisabledState = isDisabled
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -45,28 +63,23 @@ fun MainConfigScreen(
             MediumTopAppBar(
                 title = {
                     Text(
-                        "Preferences",
+                        "Other Features",
                         fontSize = androidx.compose.ui.unit.lerp(
                             34.sp,
                             22.sp,
                             scrollBehavior.state.collapsedFraction
                         )
                     )
-
                 },
-                scrollBehavior = scrollBehavior,
-                actions = {
-                    // Restart SystemUI button
-                    IconButton(onClick = {
-                        restartPackage("com.android.systemui")
-                    }) {
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Restart SystemUI",
-                            tint = MaterialTheme.colorScheme.onSurface
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
                         )
                     }
-                }
+                },
+                scrollBehavior = scrollBehavior
             )
         }
     ) { innerPadding ->
@@ -77,36 +90,14 @@ fun MainConfigScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
         ) {
-            SectionHeaderItem("Status")
+            SectionHeaderItem("Annoyances")
             Spacer(modifier = Modifier.height(8.dp))
-
-            ModuleStatusCardItem(
-                isActive = isModuleActive,
-                isRootAvailable = isRooted
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            SectionHeaderItem("Appearance")
-            Spacer(modifier = Modifier.height(8.dp))
-
-            SubmenuItem(
-                icon = Icons.Default.SignalCellularAlt,
-                title = "Status Bar",
-                subtitle = "Status bar appearance tweaks",
-                onClick = onNavigateToStatusBar
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            SectionHeaderItem("Other")
-            Spacer(modifier = Modifier.height(8.dp))
-
-            SubmenuItem(
-                icon = Icons.Default.MiscellaneousServices,
-                title = "Misc. Features",
-                subtitle = "Tweak various system features",
-                onClick = onNavigateToMisc
+            SwitchItem(
+                icon = Icons.Default.ExtensionOff,
+                title = "No Optimized Toast",
+                subtitle = "Disables the toast message that appears when closing all apps",
+                onCheckedChange = ::onOptimizationToastDisabledChange,
+                checked = optimizationToastDisabledState
             )
         }
     }

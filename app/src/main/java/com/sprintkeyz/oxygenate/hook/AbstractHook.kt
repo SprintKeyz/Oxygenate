@@ -1,5 +1,6 @@
 package com.sprintkeyz.oxygenate.hook
 
+import com.highcapable.yukihookapi.hook.log.YLog
 import com.highcapable.yukihookapi.hook.param.PackageParam
 
 // abstract class because we love c++
@@ -8,6 +9,7 @@ abstract class AbstractHook {
     // this is our open function to call onInit
     // we need our packageparam to read prefs in our hook!
     fun init(param: PackageParam) {
+        YLog.debug(isEnabled(param).toString())
         if (!isEnabled(param)) return
         onInit(param)
     }

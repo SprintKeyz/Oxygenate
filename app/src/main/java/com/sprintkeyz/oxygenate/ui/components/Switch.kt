@@ -24,6 +24,7 @@ fun SwitchItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     subtitle: String,
+    disabled: Boolean = false,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
@@ -42,7 +43,9 @@ fun SwitchItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                    alpha = if (disabled) 0.38f else 1f
+                ),
                 modifier = Modifier.size(24.dp)
             )
 
@@ -52,21 +55,26 @@ fun SwitchItem(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = if (disabled) 0.38f else 1f
+                    )
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                        alpha = if (disabled) 0.38f else 1f
+                    )
                 )
             }
 
             Spacer(modifier = Modifier.width(16.dp))
 
             Switch(
-                checked = checked,
-                onCheckedChange = onCheckedChange
+                checked = if (!disabled) checked else false,
+                onCheckedChange = onCheckedChange,
+                enabled = !disabled
             )
         }
     }

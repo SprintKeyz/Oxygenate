@@ -10,7 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,7 +28,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.highcapable.yukihookapi.hook.factory.prefs
-import com.sprintkeyz.oxygenate.data.DataConst
+import com.sprintkeyz.oxygenate.data.UIDataConst
+import com.sprintkeyz.oxygenate.data.VisibilityState
 import com.sprintkeyz.oxygenate.ui.components.SectionHeaderItem
 import com.sprintkeyz.oxygenate.ui.components.SwitchItem
 
@@ -40,15 +41,44 @@ fun StatusBarConfigScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    var isRedOneVisible by remember {
-        mutableStateOf(context.prefs().get(DataConst.HOOK_RED_ONE_ALWAYS_VISIBLE))
+    /*var redOneVisibilityState by remember {
+        mutableStateOf(
+            context.prefs().get(UIDataConst.HOOK_RED_ONE_VISIBILITY_STATE)
+                .lowercase()
+                .replaceFirstChar { it.uppercase() }
+        )
     }
 
-    fun onRedOneVisibleChange(isEnabled: Boolean) {
+    fun onRedOneVisibilityChange(value: String) {
         context.prefs().edit {
-            put(DataConst.HOOK_RED_ONE_ALWAYS_VISIBLE, isEnabled)
-            isRedOneVisible = isEnabled
+            // Store as uppercase string (the enum name)
+            put(UIDataConst.HOOK_RED_ONE_VISIBILITY_STATE, value.uppercase())
+            redOneVisibilityState = value
         }
+    }*/
+
+    // convert visibilitystate to bool
+    var redOneAlwaysVisible by remember {
+        mutableStateOf(
+            VisibilityState.valueOf(
+                context.prefs().get(UIDataConst.HOOK_RED_ONE_VISIBILITY_STATE)
+            ) == VisibilityState.ALWAYS
+        )
+    }
+
+    // can only be always or default
+    // if wondering why not a true/false, bug will be fixed eventually trust
+    fun onRedOneVisibilityChange(isEnabled: Boolean) {
+        // convert bool to visibilitystate
+        context.prefs().edit {
+            put(UIDataConst.HOOK_RED_ONE_VISIBILITY_STATE,
+                if (isEnabled)
+                    VisibilityState.ALWAYS.toString()
+                else VisibilityState.DEFAULT.toString()
+            )
+        }
+
+        redOneAlwaysVisible = isEnabled
     }
 
     Scaffold(
@@ -87,14 +117,29 @@ fun StatusBarConfigScreen(
             SectionHeaderItem("Clock")
             Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
+            /*DropdownItem(
+                icon = Icons.Default.Language,
+                title = "1 Red Color",
+                subtitle = "Visibility of the clock's red 1",
+                selectedValue = redOneVisibilityState,
+                options = VisibilityState.entries
+                    .filter{
+                        it != VisibilityState.NEVER // due to the bug, remove never option for now :(
+                    }
+                    .map { it.name.lowercase().replaceFirstChar {
+                    c -> c.uppercase()
+                } },
+                onValueChange = ::onRedOneVisibilityChange,
+                disabled = false
+            )*/
 
+            // this needs to be a switch for now (see bug report in redonehook)
             SwitchItem(
-                icon = Icons.Default.AccessTime,
-                title = "Red 1 Always Visible",
-                subtitle = "Makes the clock red 1 always visible",
-                checked = isRedOneVisible,
-                onCheckedChange = ::onRedOneVisibleChange, // fancy function ref
+                icon = Icons.Default.Timer,
+                title = "Red '1' Always Visible",
+                subtitle = "Make the red '1' in the clock always visible",
+                checked = redOneAlwaysVisible,
+                onCheckedChange = ::onRedOneVisibilityChange
             )
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExtensionOff
+import androidx.compose.material.icons.filled.FolderDelete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +48,12 @@ fun MiscConfigScreen(
         ))
     }
 
+    var closeAllOnRecentsEnabledState by remember {
+        mutableStateOf(context.prefs().get(
+            MiscDataConst.CLOSE_ALL_ON_RECENTS_ENABLED_STATE
+        ))
+    }
+
     fun onOptimizationToastDisabledChange(isDisabled: Boolean) {
         restartPackage("com.oplus.athena")
 
@@ -55,6 +62,16 @@ fun MiscConfigScreen(
         }
 
         optimizationToastDisabledState = isDisabled
+    }
+
+    fun onCloseAllOnRecentsEnabledChange(isEnabled: Boolean) {
+        restartPackage("com.android.launcher")
+
+        context.prefs().edit {
+            put(MiscDataConst.CLOSE_ALL_ON_RECENTS_ENABLED_STATE, isEnabled)
+        }
+
+        closeAllOnRecentsEnabledState = isEnabled
     }
 
     Scaffold(
@@ -95,9 +112,17 @@ fun MiscConfigScreen(
             SwitchItem(
                 icon = Icons.Default.ExtensionOff,
                 title = "No Optimized Toast",
-                subtitle = "Disables the toast message that appears when closing all apps",
+                subtitle = "Disable the toast message when closing all apps",
                 onCheckedChange = ::onOptimizationToastDisabledChange,
                 checked = optimizationToastDisabledState
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            SwitchItem(
+                icon = Icons.Default.FolderDelete,
+                title = "Close Current App",
+                subtitle = "Closing all apps clears the current app too",
+                onCheckedChange = ::onCloseAllOnRecentsEnabledChange,
+                checked = closeAllOnRecentsEnabledState
             )
         }
     }

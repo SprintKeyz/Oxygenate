@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MiscellaneousServices
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.SignalCellularAlt
@@ -35,7 +36,8 @@ fun MainConfigScreen(
     isModuleActive: Boolean,
     isRooted: Boolean,
     onNavigateToStatusBar: () -> Unit,
-    onNavigateToMisc: () -> Unit
+    onNavigateToMisc: () -> Unit,
+    onNavigateToKeyguard: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -87,19 +89,25 @@ fun MainConfigScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            SectionHeaderItem("Appearance")
+            SectionHeaderItem("Features")
             Spacer(modifier = Modifier.height(8.dp))
 
             SubmenuItem(
                 icon = Icons.Default.SignalCellularAlt,
                 title = "Status Bar",
-                subtitle = "Status bar appearance tweaks",
+                subtitle = "Status bar tweaks",
                 onClick = onNavigateToStatusBar
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            SectionHeaderItem("Other")
+            SubmenuItem(
+                icon = Icons.Default.Lock,
+                title = "Lock Screen",
+                subtitle = "Lock Screen tweaks",
+                onClick = onNavigateToKeyguard
+            )
+
             Spacer(modifier = Modifier.height(8.dp))
 
             SubmenuItem(

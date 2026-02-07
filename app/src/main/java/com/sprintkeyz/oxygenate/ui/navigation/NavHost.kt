@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.sprintkeyz.oxygenate.ui.screens.KeyguardConfigScreen
 import com.sprintkeyz.oxygenate.ui.screens.MainConfigScreen
 import com.sprintkeyz.oxygenate.ui.screens.MiscConfigScreen
 import com.sprintkeyz.oxygenate.ui.screens.StatusBarConfigScreen
@@ -52,7 +53,8 @@ fun NavHost(
                 isModuleActive = isModuleActive,
                 isRooted = isRooted,
                 onNavigateToStatusBar = { navController.navigate("statusBar") },
-                onNavigateToMisc = { navController.navigate("misc") }
+                onNavigateToMisc = { navController.navigate("misc") },
+                onNavigateToKeyguard = {navController.navigate("keyguard") }
             )
         }
 
@@ -65,6 +67,13 @@ fun NavHost(
 
         composable("misc") {
             MiscConfigScreen(
+                onBackClick = { navController.popBackStack() },
+                context = context
+            )
+        }
+
+        composable("keyguard") {
+            KeyguardConfigScreen(
                 onBackClick = { navController.popBackStack() },
                 context = context
             )

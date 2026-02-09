@@ -28,6 +28,8 @@ fun SwitchItem(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
@@ -73,7 +75,11 @@ fun SwitchItem(
 
             Switch(
                 checked = if (!disabled) checked else false,
-                onCheckedChange = onCheckedChange,
+                onCheckedChange = { newVal ->
+                    if (newVal) haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.ToggleOn)
+                    else haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.ToggleOff)
+                    onCheckedChange(newVal)
+                },
                 enabled = !disabled
             )
         }

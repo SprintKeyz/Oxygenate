@@ -3,6 +3,7 @@ package com.sprintkeyz.oxygenate.hook
 import com.highcapable.yukihookapi.YukiHookAPI
 import com.highcapable.yukihookapi.annotation.xposed.InjectYukiHookWithXposed
 import com.highcapable.yukihookapi.hook.xposed.proxy.IYukiHookXposedInit
+import com.sprintkeyz.oxygenate.hook.keyguard.KeyguardChargeTimeoutHook
 import com.sprintkeyz.oxygenate.hook.keyguard.KeyguardTimeoutHook
 import com.sprintkeyz.oxygenate.hook.misc.CloseAllRecentsHook
 import com.sprintkeyz.oxygenate.hook.misc.OptimizedToastHook
@@ -19,12 +20,14 @@ object HookEntry : IYukiHookXposedInit {
             }
             isDebug = true
         }
+
     }
 
     override fun onHook() = YukiHookAPI.encase {
         // init our hooks
         loadApp("com.android.systemui") {
             RedOneHook.init(this)
+            KeyguardChargeTimeoutHook.init(this)
         }
 
         loadApp("android") {

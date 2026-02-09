@@ -136,8 +136,8 @@ fun StatusBarConfigScreen(
             // this needs to be a switch for now (see bug report in redonehook)
             SwitchItem(
                 icon = Icons.Default.Timer,
-                title = "Red '1' Always Visible",
-                subtitle = "Make the red '1' in the clock always visible",
+                title = "Red 1 Always Visible",
+                subtitle = "Make the red 1 in the clock always visible",
                 checked = redOneAlwaysVisible,
                 onCheckedChange = ::onRedOneVisibilityChange
             )

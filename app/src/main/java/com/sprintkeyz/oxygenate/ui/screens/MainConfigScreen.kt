@@ -24,11 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import com.sprintkeyz.oxygenate.ui.components.ModuleStatusCardItem
+import com.sprintkeyz.oxygenate.ui.components.PillPopupHost
 import com.sprintkeyz.oxygenate.ui.components.SectionHeaderItem
 import com.sprintkeyz.oxygenate.ui.components.SubmenuItem
-import com.sprintkeyz.oxygenate.utils.restartPackage
+import com.sprintkeyz.oxygenate.ui.components.rememberPillPopupState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,81 +43,89 @@ fun MainConfigScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            MediumTopAppBar(
-                title = {
-                    Text(
-                        "Preferences",
-                        fontSize = androidx.compose.ui.unit.lerp(
-                            34.sp,
-                            22.sp,
-                            scrollBehavior.state.collapsedFraction
-                        )
-                    )
+    val popupState = rememberPillPopupState()
 
-                },
-                scrollBehavior = scrollBehavior,
-                actions = {
-                    // Restart SystemUI button
-                    IconButton(onClick = {
-                        restartPackage("com.android.systemui")
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Restart SystemUI",
-                            tint = MaterialTheme.colorScheme.onSurface
+    PillPopupHost(state = popupState) {
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                MediumTopAppBar(
+                    title = {
+                        Text(
+                            "Preferences",
+                            fontSize = lerp(
+                                34.sp,
+                                22.sp,
+                                scrollBehavior.state.collapsedFraction
+                            )
                         )
+
+                    },
+                    scrollBehavior = scrollBehavior,
+                    actions = {
+                        // Restart SystemUI button
+                        IconButton(onClick = {
+                            popupState.show(
+                                "Restart SystemUI?",
+                                actionText = "RESTART"
+                            ) {
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Restart SystemUI",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
-                }
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
-        ) {
-            SectionHeaderItem("Status")
-            Spacer(modifier = Modifier.height(8.dp))
+                )
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
+            ) {
+                SectionHeaderItem("Status")
+                Spacer(modifier = Modifier.height(8.dp))
 
-            ModuleStatusCardItem(
-                isActive = isModuleActive,
-                isRootAvailable = isRooted
-            )
+                ModuleStatusCardItem(
+                    isActive = isModuleActive,
+                    isRootAvailable = isRooted
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            SectionHeaderItem("Features")
-            Spacer(modifier = Modifier.height(8.dp))
+                SectionHeaderItem("Features")
+                Spacer(modifier = Modifier.height(8.dp))
 
-            SubmenuItem(
-                icon = Icons.Default.SignalCellularAlt,
-                title = "Status Bar",
-                subtitle = "Status bar tweaks",
-                onClick = onNavigateToStatusBar
-            )
+                SubmenuItem(
+                    icon = Icons.Default.SignalCellularAlt,
+                    title = "Status Bar",
+                    subtitle = "Status bar tweaks",
+                    onClick = onNavigateToStatusBar
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            SubmenuItem(
-                icon = Icons.Default.Lock,
-                title = "Lock Screen",
-                subtitle = "Lock Screen tweaks",
-                onClick = onNavigateToKeyguard
-            )
+                SubmenuItem(
+                    icon = Icons.Default.Lock,
+                    title = "Lock Screen",
+                    subtitle = "Lock Screen tweaks",
+                    onClick = onNavigateToKeyguard
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            SubmenuItem(
-                icon = Icons.Default.MiscellaneousServices,
-                title = "Misc. Features",
-                subtitle = "Tweak various system features",
-                onClick = onNavigateToMisc
-            )
+                SubmenuItem(
+                    icon = Icons.Default.MiscellaneousServices,
+                    title = "Misc. Features",
+                    subtitle = "Tweak various system features",
+                    onClick = onNavigateToMisc
+                )
+            }
         }
     }
 }

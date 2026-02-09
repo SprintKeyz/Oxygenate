@@ -95,10 +95,12 @@ We do need to override the previous function.
 object KeyguardTimeoutHook : AbstractHook() {
     override fun isEnabled(param: PackageParam): Boolean {
         // if this is true, we enable the hook
-        return param.prefs.get(MiscDataConst.LOCK_SCREEN_TIMEOUT_DISABLED_STATE)
+        return param.prefs.get(MiscDataConst.LOCK_SCREEN_TIMEOUT) != 10000L
     }
 
     override fun onInit(param: PackageParam) {
+        val timeout = param.prefs.get(MiscDataConst.LOCK_SCREEN_TIMEOUT)
+
         // enter our scope
         param.apply {
             "com.android.server.power.PowerManagerService".toClass()
@@ -110,7 +112,7 @@ object KeyguardTimeoutHook : AbstractHook() {
                     after {
                         // check if phone is locked
                         val lockedCheck = instanceClass?.getDeclaredField("mUserActivityTimeoutOverrideFromWindowManager").let { field ->
-                            field?.isAccessible = true;
+                            field?.isAccessible = true
                             field?.get(instance) as? Long
                         }
 
@@ -118,8 +120,8 @@ object KeyguardTimeoutHook : AbstractHook() {
                             return@after
                         }
 
-                        // device is locked, update. make it 12h?
-                        result = 43200000L
+                        // device is locked, update. make it 12h (43200000L)?
+                        result = timeout
                     }
                 }
 

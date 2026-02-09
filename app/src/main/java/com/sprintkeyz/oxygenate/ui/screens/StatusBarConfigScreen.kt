@@ -25,9 +25,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.highcapable.yukihookapi.hook.factory.prefs
+import com.sprintkeyz.oxygenate.data.ModifiedScopesManager
 import com.sprintkeyz.oxygenate.data.UIDataConst
 import com.sprintkeyz.oxygenate.data.VisibilityState
 import com.sprintkeyz.oxygenate.ui.components.SectionHeaderItem
@@ -40,22 +42,7 @@ fun StatusBarConfigScreen(
     context: Context
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-
-    /*var redOneVisibilityState by remember {
-        mutableStateOf(
-            context.prefs().get(UIDataConst.HOOK_RED_ONE_VISIBILITY_STATE)
-                .lowercase()
-                .replaceFirstChar { it.uppercase() }
-        )
-    }
-
-    fun onRedOneVisibilityChange(value: String) {
-        context.prefs().edit {
-            // Store as uppercase string (the enum name)
-            put(UIDataConst.HOOK_RED_ONE_VISIBILITY_STATE, value.uppercase())
-            redOneVisibilityState = value
-        }
-    }*/
+    val ctx = LocalContext.current
 
     // convert visibilitystate to bool
     var redOneAlwaysVisible by remember {
@@ -78,6 +65,7 @@ fun StatusBarConfigScreen(
             )
         }
 
+        ModifiedScopesManager.addScope("com.android.systemui", ctx)
         redOneAlwaysVisible = isEnabled
     }
 
@@ -117,23 +105,6 @@ fun StatusBarConfigScreen(
             SectionHeaderItem("Clock")
             Spacer(modifier = Modifier.height(8.dp))
 
-            /*DropdownItem(
-                icon = Icons.Default.Language,
-                title = "1 Red Color",
-                subtitle = "Visibility of the clock's red 1",
-                selectedValue = redOneVisibilityState,
-                options = VisibilityState.entries
-                    .filter{
-                        it != VisibilityState.NEVER // due to the bug, remove never option for now :(
-                    }
-                    .map { it.name.lowercase().replaceFirstChar {
-                    c -> c.uppercase()
-                } },
-                onValueChange = ::onRedOneVisibilityChange,
-                disabled = false
-            )*/
-
-            // this needs to be a switch for now (see bug report in redonehook)
             SwitchItem(
                 icon = Icons.Default.Timer,
                 title = "Red 1 Always Visible",

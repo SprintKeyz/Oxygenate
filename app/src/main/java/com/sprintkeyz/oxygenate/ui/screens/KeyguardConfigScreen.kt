@@ -22,23 +22,19 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import com.highcapable.yukihookapi.hook.factory.prefs
 import com.sprintkeyz.oxygenate.data.MiscDataConst
-import com.sprintkeyz.oxygenate.ui.components.PillPopupHost
+import com.sprintkeyz.oxygenate.data.ModifiedScopesManager
 import com.sprintkeyz.oxygenate.ui.components.SectionHeaderItem
 import com.sprintkeyz.oxygenate.ui.components.SliderItem
-import com.sprintkeyz.oxygenate.ui.components.SwitchItem
-import com.sprintkeyz.oxygenate.ui.components.rememberPillPopupState
-import com.sprintkeyz.oxygenate.utils.restartPackage
-import com.sprintkeyz.oxygenate.utils.softReboot
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,12 +43,12 @@ fun KeyguardConfigScreen(
     context: Context
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val popupState = rememberPillPopupState()
+    val ctx = LocalContext.current
 
-    var lockScreenTimeoutDisabledState by remember {
-        mutableStateOf(context.prefs().get(
-            MiscDataConst.LOCK_SCREEN_TIMEOUT_DISABLED_STATE
-        ))
+    var lockScreenTimeout by remember {
+        mutableLongStateOf(context.prefs().get(
+            MiscDataConst.LOCK_SCREEN_TIMEOUT
+        ) / 1000L)
     }
 
     var lockScreenChargingAnimTimeoutExtension by remember {
@@ -61,23 +57,15 @@ fun KeyguardConfigScreen(
         ) / 1000L)
     }
 
-    fun onLockScreenTimeoutDisabledChange(isDisabled: Boolean) {
-        context.prefs().edit {
-            put(MiscDataConst.LOCK_SCREEN_TIMEOUT_DISABLED_STATE, isDisabled)
-        }
-
-        lockScreenTimeoutDisabledState = isDisabled
-
-        popupState.show("Restart System?", "RESTART") {
-            softReboot()
-        }
+    fun onLockScreenTimeoutChange(timeout: Int) {
+        lockScreenTimeout = timeout.toLong()
     }
 
     fun onLockScreenChargingAnimTimeoutExtensionChange(extension: Int) {
         lockScreenChargingAnimTimeoutExtension = extension.toLong()
     }
 
-    fun onSliderRelease() {
+    fun onAnimSliderRelease() {
         context.prefs().edit {
             // Save the final value (multiplied by 1000)
             put(
@@ -86,13 +74,22 @@ fun KeyguardConfigScreen(
             )
         }
 
-        popupState.show("Restart SystemUI?", "RESTART") {
-            restartPackage("com.android.systemui")
+        ModifiedScopesManager.addScope("com.android.systemui", ctx)
+    }
+    fun onTimeoutSliderRelease() {
+        context.prefs().edit {
+            // Save the final value (multiplied by 1000)
+            put(
+                MiscDataConst.LOCK_SCREEN_TIMEOUT,
+                lockScreenTimeout * 1000L
+            )
         }
+
+        ModifiedScopesManager.addScope("system", ctx)
     }
 
-    PillPopupHost(state = popupState) {
-        Scaffold(
+
+    Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 MediumTopAppBar(
@@ -129,25 +126,28 @@ fun KeyguardConfigScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 SliderItem(
                     icon = Icons.Default.Animation,
-                    title = "Extend Charge Anim.",
+                    title = "Extend Charge Animation",
                     subtitle = "Extend the display time of the charging animation",
                     value = lockScreenChargingAnimTimeoutExtension.toInt(),
                     valueRange = 0..7,
                     valuePreviewTemplate = { "${it}s" },
                     onValueChange = ::onLockScreenChargingAnimTimeoutExtensionChange,
-                    onValueChangeFinished = ::onSliderRelease
+                    onValueChangeFinished = ::onAnimSliderRelease
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 SectionHeaderItem("Misc")
                 Spacer(modifier = Modifier.height(8.dp))
-                SwitchItem(
+                SliderItem(
                     icon = Icons.Default.Nightlight,
-                    title = "Disable Timeout",
-                    subtitle = "Keep the lock screen on",
-                    checked = lockScreenTimeoutDisabledState,
-                    onCheckedChange = ::onLockScreenTimeoutDisabledChange
+                    title = "Screen Off Timer",
+                    subtitle = "Change the screen off time of the lock screen (default 10s)",
+                    value = lockScreenTimeout.toInt(),
+                    valueRange = (8..26 step 2),
+                    stepSize = 2,
+                    valuePreviewTemplate = { "${it}s" },
+                    onValueChange = ::onLockScreenTimeoutChange,
+                    onValueChangeFinished = ::onTimeoutSliderRelease
                 )
             }
         }
-    }
 }

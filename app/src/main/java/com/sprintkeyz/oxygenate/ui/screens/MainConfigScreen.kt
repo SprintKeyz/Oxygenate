@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MiscellaneousServices
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,16 +21,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
+import com.sprintkeyz.oxygenate.data.ModifiedScopesManager
 import com.sprintkeyz.oxygenate.ui.components.ModuleStatusCardItem
 import com.sprintkeyz.oxygenate.ui.components.PillPopupHost
 import com.sprintkeyz.oxygenate.ui.components.SectionHeaderItem
 import com.sprintkeyz.oxygenate.ui.components.SubmenuItem
 import com.sprintkeyz.oxygenate.ui.components.rememberPillPopupState
+import com.sprintkeyz.oxygenate.utils.restartPackage
+import com.sprintkeyz.oxygenate.utils.softReboot
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,8 +50,43 @@ fun MainConfigScreen(
     onNavigateToKeyguard: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-
     val popupState = rememberPillPopupState()
+    val ctx = LocalContext.current
+    val asyncScope = rememberCoroutineScope()
+
+    fun handleApplyScopes() {
+        // get current scopes
+        val scopes = ModifiedScopesManager.getScopes(ctx)
+
+        // check if we need to restart system
+        if (scopes.contains("system")) {
+            asyncScope.launch(Dispatchers.IO) {
+                ModifiedScopesManager.removeAllScopes(ctx)
+                delay(800) // this accounts for filesystem r/w issues
+                softReboot()
+            }
+        }
+
+        // lowest to highest from here
+        if (scopes.contains("com.oplus.athena")) {
+            ModifiedScopesManager.removeScope("com.oplus.athena", ctx)
+            restartPackage("com.oplus.athena")
+        }
+
+        if (scopes.contains("com.android.launcher")) {
+            ModifiedScopesManager.removeScope("com.android.launcher", ctx)
+            restartPackage("com.android.launcher")
+        }
+
+        if (scopes.contains("com.android.systemui")) {
+            ModifiedScopesManager.removeScope("com.android.systemui", ctx)
+            restartPackage("com.android.systemui")
+        }
+    }
+
+    fun checkReboot(scopes: Set<String>): Boolean {
+        return scopes.contains("system")
+    }
 
     PillPopupHost(state = popupState) {
         Scaffold(
@@ -65,15 +108,40 @@ fun MainConfigScreen(
                     actions = {
                         // Restart SystemUI button
                         IconButton(onClick = {
+                            val scopes = ModifiedScopesManager.getScopes(ctx)
+                            val hasReboot = checkReboot(scopes)
+                            val count = scopes.size
+
+                            val msg = if (count == 0) {
+                                "Nothing to apply!"
+                            }
+                            else if (hasReboot) {
+                                "Reboot to apply?"
+                            } else if (count == 1) {
+                                "Restart $count process?"
+                            } else {
+                                "Restart $count processes?"
+                            }
+
+                            val btnText = if (count == 0) {
+                                null
+                            }
+                            else if (hasReboot) {
+                                "REBOOT"
+                            } else {
+                                "RESTART"
+                            }
+
                             popupState.show(
-                                "Restart SystemUI?",
-                                actionText = "RESTART"
+                                msg,
+                                actionText = btnText
                             ) {
+                                handleApplyScopes()
                             }
                         }) {
                             Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = "Restart SystemUI",
+                                imageVector = Icons.Default.CheckCircleOutline,
+                                contentDescription = "Apply Changes",
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
                         }

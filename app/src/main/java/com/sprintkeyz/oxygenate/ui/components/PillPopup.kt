@@ -42,13 +42,17 @@ fun PillPopup(
             tonalElevation = 6.dp
         ) {
             Row(
-                modifier = Modifier.padding(start = 20.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
+                modifier = Modifier.padding(start = (if (buttonText != null) 20.dp else 8.dp), end = 8.dp, top = 6.dp, bottom = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = message,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(end = 12.dp)
+                    modifier = if (buttonText != null) {
+                        Modifier.padding(end = 12.dp)
+                    } else {
+                        Modifier.padding(12.dp)
+                    }
                 )
 
                 if (buttonText != null) {
@@ -104,7 +108,7 @@ fun PillPopupHost(
 ) {
     LaunchedEffect(state.isVisible) {
         if (state.isVisible) {
-            delay(3000L)
+            delay(4000L)
             state.dismiss()
         }
     }

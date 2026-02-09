@@ -26,13 +26,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.highcapable.yukihookapi.hook.factory.prefs
 import com.sprintkeyz.oxygenate.data.MiscDataConst
+import com.sprintkeyz.oxygenate.data.ModifiedScopesManager
 import com.sprintkeyz.oxygenate.ui.components.SectionHeaderItem
 import com.sprintkeyz.oxygenate.ui.components.SwitchItem
-import com.sprintkeyz.oxygenate.utils.restartPackage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +42,7 @@ fun MiscConfigScreen(
     context: Context
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val ctx = LocalContext.current
 
     var optimizationToastDisabledState by remember {
         mutableStateOf(context.prefs().get(
@@ -55,23 +57,21 @@ fun MiscConfigScreen(
     }
 
     fun onOptimizationToastDisabledChange(isDisabled: Boolean) {
-        restartPackage("com.oplus.athena")
-
         context.prefs().edit {
             put(MiscDataConst.OPTIMIZATION_TOAST_DISABLED_STATE, isDisabled)
         }
 
         optimizationToastDisabledState = isDisabled
+        ModifiedScopesManager.addScope("com.oplus.athena", ctx)
     }
 
     fun onCloseAllOnRecentsEnabledChange(isEnabled: Boolean) {
-        restartPackage("com.android.launcher")
-
         context.prefs().edit {
             put(MiscDataConst.CLOSE_ALL_ON_RECENTS_ENABLED_STATE, isEnabled)
         }
 
         closeAllOnRecentsEnabledState = isEnabled
+        ModifiedScopesManager.addScope("com.android.launcher", ctx)
     }
 
     Scaffold(

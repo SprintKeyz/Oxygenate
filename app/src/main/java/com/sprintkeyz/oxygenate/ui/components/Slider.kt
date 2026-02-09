@@ -27,9 +27,10 @@ fun SliderItem(
     title: String,
     subtitle: String,
     value: Int,
-    valueRange: IntRange,
+    valueRange: IntProgression, // support steps
+    stepSize: Int = 1,
     disabled: Boolean = false,
-    valuePreviewTemplate: (Int) -> String = { it.toString() }, // Default: just the number
+    valuePreviewTemplate: (Int) -> String = { it.toString() },
     onValueChange: (Int) -> Unit,
     onValueChangeFinished: (() -> Unit)? = null
 ) {
@@ -84,7 +85,8 @@ fun SliderItem(
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary.copy(
                         alpha = if (disabled) 0.38f else 1f
-                    )
+                    ),
+                    modifier = Modifier.padding(start = 16.dp)
                 )
             }
 
@@ -102,7 +104,7 @@ fun SliderItem(
                 },
                 onValueChangeFinished = onValueChangeFinished,
                 valueRange = valueRange.first.toFloat()..valueRange.last.toFloat(),
-                steps = (valueRange.last - valueRange.first) - 1,
+                steps = ((valueRange.last - valueRange.first) / stepSize) - 1,
                 enabled = !disabled,
                 modifier = Modifier.padding(top = 8.dp)
             )

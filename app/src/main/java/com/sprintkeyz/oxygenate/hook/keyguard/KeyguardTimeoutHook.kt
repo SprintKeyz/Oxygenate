@@ -1,9 +1,10 @@
 package com.sprintkeyz.oxygenate.hook.keyguard
 
 import com.highcapable.kavaref.KavaRef.Companion.resolve
-import com.highcapable.yukihookapi.hook.log.YLog
 import com.highcapable.yukihookapi.hook.param.PackageParam
-import com.sprintkeyz.oxygenate.data.MiscDataConst
+import com.sprintkeyz.oxygenate.data.KeyguardDataConst
+import com.sprintkeyz.oxygenate.data.getPref
+import com.sprintkeyz.oxygenate.data.isHookEnabled
 import com.sprintkeyz.oxygenate.hook.AbstractHook
 
 /*
@@ -95,11 +96,10 @@ We do need to override the previous function.
 object KeyguardTimeoutHook : AbstractHook() {
     override fun isEnabled(param: PackageParam): Boolean {
         // if this is true, we enable the hook
-        return param.prefs.get(MiscDataConst.LOCK_SCREEN_TIMEOUT) != 10000L
+        return isHookEnabled(param, KeyguardDataConst.KEYGUARD_TIMEOUT)
     }
 
     override fun onInit(param: PackageParam) {
-        val timeout = param.prefs.get(MiscDataConst.LOCK_SCREEN_TIMEOUT)
 
         // enter our scope
         param.apply {
@@ -110,6 +110,8 @@ object KeyguardTimeoutHook : AbstractHook() {
                 }
                 .hook {
                     after {
+                        val timeout = getPref(param, KeyguardDataConst.KEYGUARD_TIMEOUT)
+
                         // check if phone is locked
                         val lockedCheck = instanceClass?.getDeclaredField("mUserActivityTimeoutOverrideFromWindowManager").let { field ->
                             field?.isAccessible = true
@@ -120,12 +122,10 @@ object KeyguardTimeoutHook : AbstractHook() {
                             return@after
                         }
 
-                        // device is locked, update. make it 12h (43200000L)?
+                        // device is locked, update
                         result = timeout
                     }
                 }
-
-            YLog.info("Test hook installed successfully")
         }
     }
 }

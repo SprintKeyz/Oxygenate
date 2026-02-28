@@ -24,8 +24,7 @@ class ConfigActivity : ComponentActivity() {
             OxygenateTheme {
                 NavHost(
                     isModuleActive = YukiHookAPI.Status.isModuleActive,
-                    isRooted = isRootAvailable(),
-                    context = this
+                    isRooted = isRootAvailable()
                 )
             }
         }

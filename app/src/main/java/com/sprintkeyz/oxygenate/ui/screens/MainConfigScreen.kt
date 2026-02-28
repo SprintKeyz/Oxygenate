@@ -29,11 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import com.sprintkeyz.oxygenate.data.ModifiedScopesManager
-import com.sprintkeyz.oxygenate.ui.components.ModuleStatusCardItem
-import com.sprintkeyz.oxygenate.ui.components.PillPopupHost
-import com.sprintkeyz.oxygenate.ui.components.SectionHeaderItem
-import com.sprintkeyz.oxygenate.ui.components.SubmenuItem
-import com.sprintkeyz.oxygenate.ui.components.rememberPillPopupState
+import com.sprintkeyz.oxygenate.ui.components.items.StatusItem
+import com.sprintkeyz.oxygenate.ui.components.items.PillPopupHost
+import com.sprintkeyz.oxygenate.ui.components.items.SectionHeaderItem
+import com.sprintkeyz.oxygenate.ui.components.items.SubmenuItem
+import com.sprintkeyz.oxygenate.ui.components.items.rememberPillPopupState
 import com.sprintkeyz.oxygenate.utils.restartPackage
 import com.sprintkeyz.oxygenate.utils.softReboot
 import kotlinx.coroutines.Dispatchers
@@ -159,7 +159,7 @@ fun MainConfigScreen(
                 SectionHeaderItem("Status")
                 Spacer(modifier = Modifier.height(8.dp))
 
-                ModuleStatusCardItem(
+                StatusItem(
                     isActive = isModuleActive,
                     isRootAvailable = isRooted
                 )

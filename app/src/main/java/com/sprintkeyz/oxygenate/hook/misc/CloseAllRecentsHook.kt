@@ -3,12 +3,13 @@ package com.sprintkeyz.oxygenate.hook.misc
 import com.highcapable.kavaref.KavaRef.Companion.resolve
 import com.highcapable.yukihookapi.hook.param.PackageParam
 import com.sprintkeyz.oxygenate.data.MiscDataConst
+import com.sprintkeyz.oxygenate.data.isHookEnabled
 import com.sprintkeyz.oxygenate.hook.AbstractHook
 
 object CloseAllRecentsHook : AbstractHook() {
     override fun isEnabled(param: PackageParam): Boolean {
         // if this is true, we enable the hook
-        return param.prefs.get(MiscDataConst.CLOSE_ALL_ON_RECENTS_ENABLED_STATE)
+        return isHookEnabled(param, MiscDataConst.CLOSE_ALL_RECENT_APPS)
     }
 
     override fun onInit(param: PackageParam) {

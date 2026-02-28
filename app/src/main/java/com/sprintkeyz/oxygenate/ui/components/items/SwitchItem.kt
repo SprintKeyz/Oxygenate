@@ -1,4 +1,4 @@
-package com.sprintkeyz.oxygenate.ui.components
+package com.sprintkeyz.oxygenate.ui.components.items
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,18 +17,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun SwitchItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     title: String,
     subtitle: String,
     disabled: Boolean = false,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
 ) {
-    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val haptic = LocalHapticFeedback.current
 
     Card(
         colors = CardDefaults.cardColors(
@@ -76,8 +79,8 @@ fun SwitchItem(
             Switch(
                 checked = if (!disabled) checked else false,
                 onCheckedChange = { newVal ->
-                    if (newVal) haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.ToggleOn)
-                    else haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.ToggleOff)
+                    if (newVal) haptic.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                    else haptic.performHapticFeedback(HapticFeedbackType.ToggleOff)
                     onCheckedChange(newVal)
                 },
                 enabled = !disabled

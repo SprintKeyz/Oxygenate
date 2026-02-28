@@ -1,6 +1,5 @@
 package com.sprintkeyz.oxygenate.ui.navigation
 
-import android.content.Context
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -15,8 +14,7 @@ import com.sprintkeyz.oxygenate.ui.screens.StatusBarConfigScreen
 @Composable
 fun NavHost(
     isModuleActive: Boolean,
-    isRooted: Boolean,
-    context: Context
+    isRooted: Boolean
 ) {
     val navController = rememberNavController()
 
@@ -60,22 +58,19 @@ fun NavHost(
 
         composable("statusBar") {
             StatusBarConfigScreen(
-                onBackClick = { navController.popBackStack() },
-                context = context
+                onBackClick = { navController.popBackStack() }
             )
         }
 
         composable("misc") {
             MiscConfigScreen(
-                onBackClick = { navController.popBackStack() },
-                context = context
+                onBackClick = { navController.popBackStack() }
             )
         }
 
         composable("keyguard") {
             KeyguardConfigScreen(
-                onBackClick = { navController.popBackStack() },
-                context = context
+                onBackClick = { navController.popBackStack() }
             )
         }
     }

@@ -1,4 +1,4 @@
-package com.sprintkeyz.oxygenate.ui.components
+package com.sprintkeyz.oxygenate.ui.components.items
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,23 +18,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 @Composable
 fun SliderItem(
     icon: ImageVector,
     title: String,
     subtitle: String,
-    value: Int,
+    value: Long,
     valueRange: IntProgression, // support steps
     stepSize: Int = 1,
     disabled: Boolean = false,
-    valuePreviewTemplate: (Int) -> String = { it.toString() },
-    onValueChange: (Int) -> Unit,
-    onValueChangeFinished: (() -> Unit)? = null
+    valuePreviewTemplate: (Long) -> String = { it.toString() },
+    onValueChange: (Long) -> Unit,
+    onValueChangeFinished: (() -> Unit)? = null,
 ) {
-    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val haptic = LocalHapticFeedback.current
 
     Card(
         colors = CardDefaults.cardColors(
@@ -93,11 +95,11 @@ fun SliderItem(
             Slider(
                 value = value.toFloat(),
                 onValueChange = { newValue ->
-                    val roundedValue = newValue.roundToInt()
+                    val roundedValue = newValue.roundToLong()
 
                     // trigger haptics
                     if (roundedValue != value) {
-                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     }
 
                     onValueChange(roundedValue)

@@ -1,4 +1,4 @@
-package com.sprintkeyz.oxygenate.ui.components
+package com.sprintkeyz.oxygenate.ui.components.items
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ModuleStatusCardItem(
+fun StatusItem(
     isActive: Boolean,
     isRootAvailable: Boolean
 ) {

@@ -3,19 +3,19 @@ package com.sprintkeyz.oxygenate.hook.keyguard
 import android.util.Log
 import com.highcapable.kavaref.KavaRef.Companion.resolve
 import com.highcapable.yukihookapi.hook.param.PackageParam
-import com.sprintkeyz.oxygenate.data.MiscDataConst
+import com.sprintkeyz.oxygenate.data.KeyguardDataConst
+import com.sprintkeyz.oxygenate.data.getPref
+import com.sprintkeyz.oxygenate.data.isHookEnabled
 import com.sprintkeyz.oxygenate.hook.AbstractHook
 
 object KeyguardChargeTimeoutHook : AbstractHook() {
     override fun isEnabled(param: PackageParam): Boolean {
         // if this is true, we enable the hook
-        return param.prefs.get(MiscDataConst.LOCK_SCREEN_CHARGING_ANIM_TIMEOUT_EXTENSION) != 0L
+        return isHookEnabled(param, KeyguardDataConst.KEYGUARD_CHARGE_ANIM_EXTENSION)
     }
 
     // time out
     override fun onInit(param: PackageParam) {
-        val delayTime = param.prefs.get(MiscDataConst.LOCK_SCREEN_CHARGING_ANIM_TIMEOUT_EXTENSION)
-
         // enter our scope
         param.apply {
             "com.oplus.charge.viewmodel.OplusChargeAnimImpl".toClass()
@@ -25,6 +25,8 @@ object KeyguardChargeTimeoutHook : AbstractHook() {
                 }
                 .hook {
                     before {
+                        val delayTime = getPref(param, KeyguardDataConst.KEYGUARD_CHARGE_ANIM_EXTENSION)
+
                         val arg0 = args[0]
                         val arg1 = args[1]
 

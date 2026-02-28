@@ -1,4 +1,4 @@
-package com.sprintkeyz.oxygenate.ui.components
+package com.sprintkeyz.oxygenate.ui.components.items
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme

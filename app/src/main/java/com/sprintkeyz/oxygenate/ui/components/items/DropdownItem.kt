@@ -1,4 +1,4 @@
-package com.sprintkeyz.oxygenate.ui.components
+package com.sprintkeyz.oxygenate.ui.components.items
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -29,13 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Suppress("unused")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     title: String,
     subtitle: String? = null,
     selectedValue: String,

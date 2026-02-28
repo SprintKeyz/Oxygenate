@@ -1,11 +1,17 @@
-package com.sprintkeyz.oxygenate.ui.components
+package com.sprintkeyz.oxygenate.ui.components.items
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -24,19 +30,19 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
 @Composable
-fun PillPopup(
+fun PillPopupItem(
     message: String,
     buttonText: String? = null,
     isVisible: Boolean,
     onButtonClick: () -> Unit
 ) {
-    androidx.compose.animation.AnimatedVisibility(
+    AnimatedVisibility(
         visible = isVisible,
-        enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.slideInVertically(initialOffsetY = { it / 2 }),
-        exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.slideOutVertically(targetOffsetY = { it / 2 })
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+        exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
     ) {
         Surface(
-            shape = androidx.compose.foundation.shape.CircleShape,
+            shape = CircleShape,
             color = MaterialTheme.colorScheme.inverseSurface,
             contentColor = MaterialTheme.colorScheme.inverseOnSurface,
             tonalElevation = 6.dp
@@ -58,7 +64,7 @@ fun PillPopup(
                 if (buttonText != null) {
                     Button(
                         onClick = onButtonClick,
-                        shape = androidx.compose.foundation.shape.CircleShape,
+                        shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary
@@ -122,7 +128,7 @@ fun PillPopupHost(
                 .padding(bottom = 32.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
-            PillPopup(
+            PillPopupItem(
                 message = state.message,
                 buttonText = state.buttonText,
                 isVisible = state.isVisible,

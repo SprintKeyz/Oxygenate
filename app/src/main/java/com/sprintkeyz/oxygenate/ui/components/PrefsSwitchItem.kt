@@ -16,7 +16,8 @@ fun PrefsSwitchItem(
     icon: ImageVector,
     title: String,
     subtitle: String,
-    disabled: Boolean = false
+    disabled: Boolean = false,
+    onCheckedChange: ((Boolean) -> Unit)? = null
 ) {
     val ctx = LocalContext.current
 
@@ -32,6 +33,7 @@ fun PrefsSwitchItem(
         onCheckedChange = { newValue ->
             currentValue = newValue
             setPref(ctx, configItem, currentValue)
+            onCheckedChange?.invoke(currentValue)
         }
     )
 }

@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
@@ -42,7 +43,7 @@ fun MiscConfigScreen(
     onBackClick: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val autoBrightnessTweakState by rememberPref(DisplayDataConst.AUTO_BRIGHTNESS_TWEAKS)
+    var autoBrightnessTweakState by rememberPref(DisplayDataConst.AUTO_BRIGHTNESS_TWEAKS)
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -100,7 +101,8 @@ fun MiscConfigScreen(
                 icon = Icons.Default.BrightnessAuto,
                 title = "Brightness Tweaks",
                 subtitle = "Enable auto brightness algorithm tweaks",
-                configItem = DisplayDataConst.AUTO_BRIGHTNESS_TWEAKS
+                configItem = DisplayDataConst.AUTO_BRIGHTNESS_TWEAKS,
+                onCheckedChange = { autoBrightnessTweakState = it }
             )
 
             Spacer(modifier = Modifier.height(8.dp))

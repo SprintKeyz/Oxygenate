@@ -42,7 +42,7 @@ inline fun <reified T> getPref(
         }
 
         percentage -> {
-            (value.toFloat() * 100f).toInt()
+            value.toFloat() * 100f
         }
 
         else -> value

@@ -50,23 +50,27 @@ fun PrefsSliderItem(
         disabled = disabled,
         valuePreviewTemplate = valuePreviewTemplate,
         onValueChange = { newValue ->
-            currentValue = newValue
-            currentValue // this suppresses the false warning lmao
+            // make sure we preserve the type
+            currentValue = when (currentValue) {
+                is Float -> newValue.toFloat()
+                is Int -> newValue.toInt()
+                else -> newValue
+            }
+            currentValue // fixes warning lmao
         },
         onValueChangeFinished = {
-            // 4. Use your existing logic to save back to the specific type
             when (configItem.pref.value) {
                 is Float -> {
                     @Suppress("UNCHECKED_CAST")
-                    setPref(ctx, configItem as ConfigItem<Float>, currentValue.toFloat(), prefsDurationUnit, prefsIsPercentage)
+                    setPref(ctx, configAsNumber as ConfigItem<Float>, currentValue.toFloat(), prefsDurationUnit, prefsIsPercentage)
                 }
                 is Int -> {
                     @Suppress("UNCHECKED_CAST")
-                    setPref(ctx, configItem as ConfigItem<Int>, currentValue.toInt(), prefsDurationUnit, prefsIsPercentage)
+                    setPref(ctx, configAsNumber as ConfigItem<Int>, currentValue.toInt(), prefsDurationUnit, prefsIsPercentage)
                 }
                 else -> {
                     @Suppress("UNCHECKED_CAST")
-                    setPref(ctx, configItem as ConfigItem<Long>, currentValue.toLong(), prefsDurationUnit, prefsIsPercentage)
+                    setPref(ctx, configAsNumber as ConfigItem<Long>, currentValue.toLong(), prefsDurationUnit, prefsIsPercentage)
                 }
             }
         }
